@@ -1,0 +1,17 @@
+G = (Vn, Vt, P, S)
+
+Vn = {}
+
+Vt = {}
+
+p = {
+
+<expr> ::= <lvalue> <assignment> <expr01> | <expr>
+<expr01> ::= <expr01> || <expr01> | <expr02>
+<expr02> ::= <expr03> && <expr02> | <expr03>
+<expr03> ::= !<expr03> | <expr04>
+
+}
+
+S = {}
+
