@@ -2,7 +2,12 @@ G = (Vn, Vt, P, S)
 
 Vn = {}
 
-Vt = {}
+Vt = {
+/// ricardo
+0,1,2,3,4,5,6,7,8,9,
+a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,
+_,(,),{,},^,*,/,%,+,-,!,<,>,=,&,;
+}
 
 p = {
 
@@ -10,6 +15,18 @@ p = {
 <expr01> ::= <expr01> || <expr01> | <expr02>
 <expr02> ::= <expr03> && <expr02> | <expr03>
 <expr03> ::= !<expr03> | <expr04>
+
+
+/// ricardo
+<signal> ::= +|-
+<digit> ::= 0|1|2|3|4|5|6|7|8|9
+<char> ::= a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z|_
+<oper_incdec> ::= ++|--
+<oper_aritm> ::= ^|*|/|%|+|-
+<oper_assig> ::= =|+=|-=|*=|/=|%=|^=
+<oper_comp> ::= ==|<=|>=|!=|<|>
+<oper_logic> ::= !|&&|||
+
 
 }
 
