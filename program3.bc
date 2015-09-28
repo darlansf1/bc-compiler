@@ -1,0 +1,9 @@
+define func() {
+    return 2 + 3
+}
+
+print func()
+quit
+
+
+

@@ -1,0 +1,10 @@
+define func() {
+    print 2 + 3
+    return
+}
+
+func()
+quit
+
+
+
