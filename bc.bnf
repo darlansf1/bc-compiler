@@ -1,181 +1,154 @@
-G = (V_n, V_t, P, <program>)
+G = (V_n, V_t, P, program)
 
 V_n = {
- <program>, <statement>, <multi_statement>, <command>, <if>,<if_else>, <while><for>, <string>, <any_char>, <print>, <expr_list>, <expr>, <left_value>, <inc_dec_post>, <bool_or>, <bool_and>, <bool_not>, <comparison>, <assignment>, <plus_minus>, <mult_div_mod>, <power>, <unary_minus>, <inc_dec_prev>,<value>, <function>, <function_definition>, <arguments>, <simple_command>, <return>, <number>, <integer>, <float>, <variable>, <alpha_numeric>, <digit>, <letter>, <symbol>, <assignment>, <comparison>, <arithmetic>, <unary>, <unary-op>, <parenthesis>, <assignment_symbols>, <comparison_symbols>, <arithmetic_symbols>, <plus_minus_symbols>, <inc_dec_symbols>, <mult_div_mod_symbols> 
+program, statement, multi_statement, command, if,if_else, whilefor, string, any_char, print, expr_list, expr, left_value, inc_dec_post, bool_or, bool_and, bool_not, comparison, assignment, plus_minus, mult_div_mod, power, unary_minus, inc_dec_prev,value, function, function_definition, arguments, simple_command, return, number, integer, float, variable, alpha_numeric, digit, letter, symbol, assignment, comparison, arithmetic, unary, unary-op, parenthesis, assignment_symbols, comparison_symbols, arithmetic_symbols, plus_minus_symbols, inc_dec_symbols, mult_div_mod_symbols
 }
 
 V_t = {
- , !, ", &, %, ^, *, (, ), ', +, ,, -, ., /, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, :, ;, <, =, >, [, \, ], _, `, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z, {, |, }, ~, define, auto, return, if, else, while, for, null, statement, break, continue, quit, print, sqrt, length, scale, ibase, obase, last, lambda
+ “ ”, “!”, “"”, “%”, “&”, “'”, “(“, “)”, “*”, “+”, “|”, “-”, “.”, “/”, “:”, “;”, “<”, “=”, “>”, “[”, “]”, “^”, “{”, “,”, “}”, “0”, “1”, “2”, “3”, “4”, “5”, “6”, “7”, “8”, “9”, “_”, “`”, “a”, “b”, “c”, “d”, “e”, “f”, “g”, “h”, “i”, “j”, “k”, “l”, “m”, “n”, “o”, “p”, “q”, “r”, “s”, “t”, “u”, “v”, “w”, “x”, “y”, “z”, “~”, “define”, “auto”, “return”, “if”, “else”, “while”, “for”, “null”, “statement”, “break”, “continue”, “quit”, “print”, “sqrt”, “length”, “scale”, “ibase”, “obase”, “last”, lambda
 }
-
 
 P = {
+program ::= {statement | function_definition}
 
-01. <program> ::=  <statement> <program>
-    | <statement>
-    | <function_definition><program> 
-    | lambda
+2.	statement ::= expr
+  | “{”multi_statement“}” 
+  | simple_command
+  | print
+  | string
+  | command (expr | “{”multi_statement“}” | simple_command | print | string | command)
 
-02. <statement> ::= <expr>
-		       | {<multi_statement>}
-		       | <command> <statement>
-		       | <simple_command>
-		       | <print>
-		       | <string>
-		     
+3. 	multi_statement ::= statement {“;” statement}
 
-03. <multi_statement> := <statement>; <multi_statement>
-		               | <statement>
+4.	command ::= if
+        | if_else
+        | while
+        | for
 
-04. <command> ::= <if>
-		      | <if_else>
-		      | <while>
-		      | <for>
+5.	if ::= “if” “(“expr”)”
 
-05. <if> ::= if (<expr>)
+6.	if_else ::= “if” “(” expr “)” statement else
 
-06. <if_else> ::= if(<expr>) <statement> else
+7.	while ::= “while” “(”expr“)”
 
+8.	for ::= “for” “(” “;” “;” “)”
+	        | “for” “(” expr “;” “;‘” “)”
+  | “for” “(” “;” expr “;” “)”
+  | “for” “(” “;” “;” expr “)”
+  | “for” “(” expr “;” expr “;” “)”
+  | “for” “(” expr “;” “;” expr “)”
+  | “for” “(” “;” expr “;” expr “)”
+  | “for” “(” expr “;” expr “;” expr “)”
 
-07. <while> ::= while(<expr>)
+9.	string ::= ““”many_chars“””
 
-08. <for> ::= for (  ;  ; )
-                  | for ( <expr> ;  ;  )
-                  | for (  ; <expr> ;  )
-                  | for (  ;  ; <expr> )
-                  | for ( <expr> ; <expr> ;  )
-                  | for ( <expr> ;  ; <expr> ) 
-                  | for (  ; <expr> ; <expr> )
-                  | for ( <expr> ; <expr> ; <expr> ) 
+10. many_chars ::= (letter | digit | symbol) {letter | digit | symbol}
 
+11. print ::= “print” expr_list
 
-09. <string> ::= “<many_chars>”
+12. expr_list ::= (expr | string) {“,” expr | “,” string}
 
-10. <many_chars> ::= <letter><many_chars>
-		          | <digit><many_chars>
-		          | <symbol> <many_chars>
-          | <letter>
-          | <digit>
-          | <symbol>
+13. expr ::= left_value assignment_symbols inc_dec_post
+     		| inc_dec_post
 
-11. <print> ::= print <expr_list>	  
+14. inc_dec_post ::= bool_or inc_dec_symbols
+			  | bool_or
 
-12. <expr_list> ::= <expr>,  <expr_list>
-		    | <string>, <expr_list>
-		    | <expr>
-		    | <string>
+15. left_value ::= variable [ “[” expr “]” ]
 
-13. <expr> ::= <left_value> <assignment_symbols> <inc_dec_post> 
-   	          | <inc_dec_post>
+16. bool_or ::= bool_and “||” bool_and {“||” bool_and}
+		     | bool_and
 
-14. <inc_dec_post> ::= <bool_or><inc_dec_symbols>
-| <bool_or>
+17. bool_and ::= bool_not “&&” bool_not {“&&” bool_not}
+		       | bool_not
 
-15. <left_value> ::= <variable>
-	                  | <variable>[<expr>]
+18. bool_not ::= “!”comparison {“!”comparison}
+		      | comparison
 
-16. <bool_or> ::= <bool_and> || <bool_or> 
-              | <bool_and>
+19. comparison ::= assignment comparison_symbols assignment
+		           | assignment 
 
-17. <bool_and> ::= <bool_not> && <bool_and> 
-                             | <bool_not>
+20. assingment ::= plus_minus assignment_symbols plus_minus {assignment_symbols plus_minus}
+		           | plus_minus
 
-18. <bool_not> ::= !<bool_not> 
-     | <comparison>
+21. plus_minus ::= mult_div_mod plus_minus_symbols mult_div_mod {plus_minus_symbols mult_div_mod}
+		          | mult_div_mod
 
-19. <comparison> ::= <assignment> <comparison_symbols> <assignment>
-         | <assignment>
+22. mult_div_mod ::= power mult_div_mod_symbols power {mult_div_mod_symbols power}
+			   | power
 
-20. <assignment> ::= <plus_minus> <assignment_symbols> <assignment>
-                                 | <plus_minus>
+23. power ::= unary_minus “^” unary_minus {“^” unary_minus}
+		  | unary_minus
 
-21. <plus_minus> ::= <plus_minus> <plus_minus_symbols> <mult_div_mod> 
-         | <mult_div_mod>
+24. unary_minus ::= “-”inc_dec_prev
+			 | inc_dec_prev
 
-22. <mult_div_mod> ::= <mult_div_mod> <mult_div_mod_symbols> <power> 
-     		             | <power>
+25. inc_dec_prev ::= inc_dec_symbols parenthesis
+			  | parenthesis
 
-23. <power> ::= <power> ^ <unary_minus> 
-                        | <unary_minus>
+26. parenthesis ::= (expr)
+			| value
 
-24. <unary_minus> ::= -<unary_minus>
-| <inc_dec_prev>
+27. value ::= left_value
+ | function
+ | integer
+ | float 
 
-25. <inc_dec_prev> ::= <inc_dec_symbols><parenthesis> 
-      		   | <parenthesis>
+28. function ::= variable “(” arguments “)”
+		     | “sqrt” “(” expr “)”
+		     | “length” “(” expr “)”
+		     | “scale” “(” expr “)”
+		     | “s” “(” expr “)”
+		     | “c” “(” expr “)”
+		     | “e” “(” expr “)”
+		     | “l” “(” expr “)”
+		     | “a” “(” expr “)”
+		     | “j” “(” expr “,” expr “)”
 
-26. <parenthesis> ::= (<expr>)
-		         | <value>
+29. function_definition ::= “define” variable “(” arguments “)” “{” “auto” arguments statement return “}”
+			          | “define” variable “(” arguments “)” “{” statement return “}”
 
-27. <value> ::= <left_value>
-	           | <function>
-	           | <integer>
-	           | <float>
+30. arguments ::= [ variable {“,” variable} ]
 
-28. <function> ::= <variable>(<arguments>) 
-   | sqrt(<expr>)
-	               | length(<expr>)
-	               | scale(<expr>)
-	               | s(<expr>)
-	               | c(<expr>)
-	               | e(<expr>)
-	               | l(<expr>)
-	               | a(<expr>)
-	               | j(<expr>, <expr>)
+31. simple_command ::= “null statement”
+			         | “break”
+			         | “continue”
+			         | “quit”
 
+32. return ::= “return”
+		  | “return” “(” “)”
+		  | “return” expr
 
+33. number ::= digit {digit}
 
-29. <function_definition> ::= define <variable> (<arguments>) { auto <arguments> <statement> <return>}
-	                               | define <variable> (<arguments>) { <statement> <return>}
+34. integer ::= [plus_minus_symbols] number
 
+35. float ::= [plus_minus_symbols] number “.” number
 
-30. <arguments> ::= <variable>,<arguments>
-	        | <variable>
-	        | lambda
+36. variable ::= letter {alpha-numeric}
 
-31. <simple_command> ::= null statement
-			       | break
-			       | continue
-			       | quit
+37. alpha_numeric ::= {letter | digit}
 
-32. <return> ::= return
-                        | return ()
-                        | return <expr>
+38. digit ::= “0” | “1” | “2” | “3” | “4” | “5” | “6” | “7” | “8” | “9”
 
-33. <number> ::= <digit> <number>
+39. letter ::= “a” | “b” | “c” | “d” | “e” | “f” | “g” | “h” | “i” | “j”
+      	              | “k” | “l” | “m” | “n” | “o” | “p” | “q” | “r” | “s” | “t”
+                          | “u” | “v” | “w” | “x” | “y” | “z” | “_”
 
-34. <integer> ::= <number> | <plus_minus_symbols> <number>
+40. symbol ::= “ ” | “!” | “"”  | “%” | “&” | “'” | “(“ | “)” | “*”
+      	                 | “+” | “,” | “-” | “.” | “/” | “:” | “;” | “<” | “=” | “>” 
+      	                 | “[” | “]” | “^” | “{” | “|” | “}”
 
-35. <float> ::= <plus_minus_symbols> <number> . <number>
-                     | <number> . <number>
-36. <variable> ::= <letter> <alpha_numeric>
+41. assignment_symbols ::= “=” | “-=” | “+=” | “/=” | “*=” | “%=” | “^=” 
 
-37. <alpha_numeric> ::= <letter> <alpha_numeric>
-                         	  | <digit>  <alpha_numeric>
-                         	  | <letter>
-                         	  | <digit>
-			  | lambda 
+42. comparison_symbols ::= “>=” | “>”  | “==” | “!=” | “<=” | “<” 
 
-38. <digit> ::= 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
+43. arithmetic_symbols ::= “-” | “+” | “%” | “/” | “*”
 
-39. <letter> ::= a | b | c | d | e | f | g | h | i | j
-      	           | k | l | m | n | o | p | q | r | s | t
-                       | u | v | w | x | y | z|_
+44. plus_minus_symbols ::= “-” | “+”
 
-40. <symbol> ::=   | ! | "  | % | & | ' | ( | ) | *
-      	             | + | , | - | . | / | : | ; | < | = | > 
-      	             | [  | ] | ^ | { | | | } 
+45. inc_dec_symbols ::= “++” | “--”
 
-41. <assignment_symbols> ::=   = | -= | += | /= | *= | %= | ^=
+46. mult_div_mod_symbols ::= “*” | “/” | “%”
 
-42. <comparison_symbols> ::=  >= | >  | == | != | <= | < 
-
-43. <arithmetic_symbols> ::=   - | +  | %  |  / | *
-
-44. <plus_minus_symbols> ::=   - | +
-
-45. <inc_dec_symbols> ::= -- | ++
-
-46. <mult_div_mod_symbols> ::= * | / | %
 }
-
