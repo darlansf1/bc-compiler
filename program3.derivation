@@ -1,0 +1,76 @@
+define func() {return 2 + 3}print func()quit -> <program>
+01-> <function_definition><program>
+29->define <variable>(<arguments>) {<return>}<program>
+36->define <letter><alpha-numeric>(<arguments>) {<return>}<program>
+39->define f<alpha-numeric>(<arguments>) {<return>}<program>
+37->define f<letter><alpha-numeric>(<arguments>) {<return>}<program>
+39->define fu<alpha-numeric>(<arguments>) {<return>}<program>
+37->define fu<letter><alpha-numeric>(<arguments>) {<return>}<program>
+39->define fun<alpha-numeric>(<arguments>) {<return>}<program>
+37->define fun<letter>(<arguments>) {<return>}<program>
+39->define func(<arguments>) {<return>}<program>
+30->define func() { <return>}<program>
+32->define func() {return<expr>}<program>
+13->define func() {return<inc_dec_post>}<program>
+14->define func() {return<bool_or>}<program>
+16->define func() {return<bool_and>}<program>
+17->define func() {return<bool_not>}<program>
+18->define func() {return<comparison>}<program>
+19->define func() {return<assignment>}<program>
+20->define func() {return<plus_minus>}<program>
+21->define func() {return<plus_minus><plus_minus_symbols><mult_div_mod>}<program>
+21->define func() {return<mult_div_mod><plus_minus_symbols><mult_div_mod>}<program>
+22->define func() {return<power><plus_minus_symbols <mult_div_mod>}<program>
+23->define func() {return<unary_minus><plus_minus_symbols><mult_div_mod>}<program>
+24->define func() {return<inc_dec_prev><plus_minus_symbols><mult_div_mod>}<program>
+25->define func() {return<parenthesis><plus_minus_symbols><mult_div_mod>}<program>
+26->define func() {return<value><plus_minus_symbols><mult_div_mod>}<program>
+27->define func() {return<integer><plus_minus_symbols><mult_div_mod>}<program>
+34->define func() {return<number><plus_minus_symbols><mult_div_mod>}<program>
+33->define func() {return<digit><plus_minus_symbols><mult_div_mod>}<program>
+38->define func() {return 2<plus_minus_symbols><mult_div_mod>}<program>
+44->define func() {return 2+<mult_div_mod>}<program>
+22->define func() {return 2+<power>}<program>
+23->define func() {return 2+<unary_minus>}<program>
+24->define func() {return 2+<inc_dec_prev>}<program>
+25->define func() {return 2+<parenthesis>}<program>
+26->define func() {return 2+<value>}<program>
+27->define func() {return 2+<integer>}<program>
+34->define func() {return 2+<number>}<program>
+33->define func() {return 2+<digit>}<program>
+38->define func() {return 2+3}<program>
+01->define func() {return 2+3}<statement><program>
+02->define func() {return 2+3}<print><program>
+11->define func() {return 2+3}print<expr_list><program>
+12->define func() {return 2+3}print<exp><program>
+13->define func() {return 2+3}print<inc_dec_post><program>
+14->define func() {return 2+3}print<bool_or><program>
+16->define func() {return 2+3}print<bool_and><program>
+17->define func() {return 2+3}print<bool_not><program>
+18->define func() {return 2+3}print<comparison><program>
+19->define func() {return 2+3}print<assignment><program>
+20->define func() {return 2+3}print<plus_minus><program>
+22->define func() {return 2+3}print<mult_div_mod><program>
+22->define func() {return 2+3}print<power><program>
+23->define func() {return 2+3}print<unary_minus><program>
+24->define func() {return 2+3}print<inc_dec_prev><program>
+25->define func() {return 2+3}print<parenthesis><program>
+26->define func() {return 2+3}print<value><program>
+27->define func() {return 2+3}print<function><program>
+28->define func() {return 2+3}print<variable>(<arguments>)<program>
+36->define func() {return 2+3}print<letter><alpha_numeric>(<arguments>)<program>
+39->define func() {return 2+3}print f<alpha_numeric>(<arguments>)<program>
+37->define func() {return 2+3}print f<letter><alpha_numeric>(<arguments>)<program>
+39->define func() {return 2+3}print fu<alpha_numeric>(<arguments>)<program>
+37->define func() {return 2+3}print fu<letter><alpha_numeric>(<arguments>)<program>
+39->define func() {return 2+3}print fun<alpha_numeric>(<arguments>)<program>
+37->define func() {return 2+3}print fun<letter><alpha_numeric>(<arguments>)<program>
+39->define func() {return 2+3}print func<alpha_numeric>(<arguments>)<program>
+37->define func() {return 2+3}print func(<arguments>)<program>
+30->define func() {return 2+3}print func()<program>
+01->define func() {return 2+3}print func()<statement>
+02->define func() {return 2+3}print func()<simple_command>
+31->define func() {return 2+3}print func() quit
+
+
+
