@@ -1,0 +1,128 @@
+options{}
+PARSER_BEGIN(Calculator)
+import java.io.*;
+
+public class Calculator{
+	public static void main(String[] args) throws ParseException, TokenMgrError{
+		Calculator calc = new Calculator(System.in);
+		try{
+			calc.start();
+			System.out.println("sucesso!");
+		}catch (Exception e) {
+			System.out.println("Nao sucesso");
+		}
+	}
+}
+
+PARSER_END(Calculator)
+
+SKIP:
+{
+	" "
+|	"\t"
+}
+
+
+/* Operadores */
+TOKEN:
+{
+	<PLUS: "+" >
+|	<MINUS: "-" >
+|	<MUL: "*">
+|	<DIV: "/">
+}
+
+TOKEN:
+{
+	<LPAR: "(">
+|	<RPAR: ")">
+}
+
+TOKEN:
+{
+	<EOL: "\n" | "\r" | "\r\n" >
+}
+
+TOKEN:
+{
+	<#DIGIT: ["0"-"9"] >
+|	<INTEGER: (<DIGIT>)+ >
+}
+
+
+/*
+  	<start> ::= (<expr>)*
+	<expr> 	::= <term> {(+|-) <term>}		
+	<term> 	::= <factor> {(*|/) <factor>}
+	<factor>::= (<expr>) | <num>
+	<num> 	::= int 
+*/
+void start():
+{/*var locais*/
+	int value;
+}
+{
+	( value=expr() <EOL> { System.out.println("> result: "+value); } )+ // se colocar * não dará erro p/ --3, --..-, ++..+ 
+}
+
+int expr():
+{
+	Token t;
+	int t1, t2;
+	Operation op=null;
+}
+{
+	// <expr> 	::= <term> {(+|-) <term>}
+	t1=term() ( 
+				(
+					t=<PLUS>	{ op = new Sum(); }
+				| 	t=<MINUS>	{ op = new Sub(); }
+				) 
+				t2=term()		{
+									t1 = op.calculate(t1, t2);
+								}
+			)*
+	{ return t1; }
+}
+
+int term():
+{ 
+	int f1, f2; 
+	Operation op=null; 
+}
+{
+	//<term> 	::= <factor> {(*|/) <factor>}
+	f1=factor() (
+				(
+					<MUL>		{ op = new Mul();}
+				|	<DIV>		{ op = new Div();}
+				) 
+				f2=factor()		{
+									f1 = op.calculate(f1, f2);
+								}
+			)*
+	{ return f1; }
+}
+
+int factor():
+{ int i; }
+{
+	//<factor>::= (<expr>) | <num>
+	<LPAR> i=expr() <RPAR>		{ return i; }
+|	i=num()						{ return i; }
+}
+
+int num():
+{	
+	Token t;
+}
+{
+	//<num> 	::= int
+	t=<INTEGER> 	{
+						try{
+							return Integer.parseInt(t.image);
+						}catch (NumberFormatException e) {
+							System.out.println("ERROR: Integer overflow.");
+						}
+					}
+}
