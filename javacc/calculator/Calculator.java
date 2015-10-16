@@ -44,7 +44,7 @@ public class Calculator implements CalculatorConstants {
         int t1, t2;
         Operation op=null;
     // <expr> 	::= <term> {(+|-) <term>}
-            t1 = term();
+        t1 = term();
     label_2:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -59,11 +59,13 @@ public class Calculator implements CalculatorConstants {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case PLUS:
         t = jj_consume_token(PLUS);
-                                                          op = new Sum();
+                        System.out.printf("@(%d,%d)\u005ctPLUS\u005ct-\u005ct%s\u005cn", t.beginLine, t.beginColumn, t);
+                        op = new Sum();
         break;
       case MINUS:
         t = jj_consume_token(MINUS);
-                                                          op = new Sub();
+                     System.out.printf("@(%d,%d)\u005ctMINUS\u005ct-\u005ct%s\u005cn", t.beginLine, t.beginColumn, t);
+                    op = new Sub();
         break;
       default:
         jj_la1[2] = jj_gen;
@@ -72,12 +74,15 @@ public class Calculator implements CalculatorConstants {
       }
       t2 = term();
                                                                         t1 = op.calculate(t1, t2);
+                                                                        //System.out.println("<TERM>" + t.beginLine + " " + t.beginColumn);
+
     }
           {if (true) return t1;}
     throw new Error("Missing return statement in function");
   }
 
   static final public int term() throws ParseException {
+        Token t;
         int f1, f2;
         Operation op=null;
     //<term> 	::= <factor> {(*|/) <factor>}
@@ -95,12 +100,14 @@ public class Calculator implements CalculatorConstants {
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case MUL:
-        jj_consume_token(MUL);
-                                                          op = new Mul();
+        t = jj_consume_token(MUL);
+                        op = new Mul();
+                        System.out.printf("@(%d,%d)\u005ctMUL\u005ct-\u005ct%s\u005cn", t.beginLine, t.beginColumn, t);
         break;
       case DIV:
-        jj_consume_token(DIV);
-                                                          op = new Div();
+        t = jj_consume_token(DIV);
+                    op = new Div();
+                    System.out.printf("@(%d,%d)\u005ctDIV\u005ct-\u005ct%s\u005cn", t.beginLine, t.beginColumn, t);
         break;
       default:
         jj_la1[4] = jj_gen;
@@ -139,6 +146,8 @@ public class Calculator implements CalculatorConstants {
         Token t;
     //<num> 	::= int
             t = jj_consume_token(INTEGER);
+                        System.out.printf("@(%d,%d)\u005ctINTEGER\u005ct-\u005ct%s\u005cn", t.beginLine, t.beginColumn, t);
+
                                                 try{
                                                         {if (true) return Integer.parseInt(t.image);}
                                                 }catch (NumberFormatException e) {

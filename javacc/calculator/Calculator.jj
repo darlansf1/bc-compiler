@@ -70,16 +70,29 @@ int expr():
 	Token t;
 	int t1, t2;
 	Operation op=null;
+	
+	//System.out.println("<expr>");
 }
 {
 	// <expr> 	::= <term> {(+|-) <term>}
-	t1=term() ( 
+    t1=term() ( 
+
+       
 				(
-					t=<PLUS>	{ op = new Sum(); }
-				| 	t=<MINUS>	{ op = new Sub(); }
-				) 
+					t = <PLUS> {
+                        System.out.printf("@(%d,%d)\tPLUS\t-\t%s\n", t.beginLine, t.beginColumn, t);
+                        op = new Sum(); 
+                        }
+
+				| 	t=<MINUS> {
+                     System.out.printf("@(%d,%d)\tMINUS\t-\t%s\n", t.beginLine, t.beginColumn, t);
+                    op = new Sub(); 
+                    }
+				)
+				 
 				t2=term()		{
 									t1 = op.calculate(t1, t2);
+									//System.out.println("<TERM>" + t.beginLine + " " + t.beginColumn);
 								}
 			)*
 	{ return t1; }
@@ -87,6 +100,7 @@ int expr():
 
 int term():
 { 
+	Token t;
 	int f1, f2; 
 	Operation op=null; 
 }
@@ -94,8 +108,16 @@ int term():
 	//<term> 	::= <factor> {(*|/) <factor>}
 	f1=factor() (
 				(
-					<MUL>		{ op = new Mul();}
-				|	<DIV>		{ op = new Div();}
+					t = <MUL> { 
+                        op = new Mul();
+                        System.out.printf("@(%d,%d)\tMUL\t-\t%s\n", t.beginLine, t.beginColumn, t);
+                    }
+                        
+				|	t = <DIV> { 
+                    op = new Div();
+                    System.out.printf("@(%d,%d)\tDIV\t-\t%s\n", t.beginLine, t.beginColumn, t);
+
+                    }
 				) 
 				f2=factor()		{
 									f1 = op.calculate(f1, f2);
@@ -119,6 +141,8 @@ int num():
 {
 	//<num> 	::= int
 	t=<INTEGER> 	{
+                        System.out.printf("@(%d,%d)\tINTEGER\t-\t%s\n", t.beginLine, t.beginColumn, t);
+                       
 						try{
 							return Integer.parseInt(t.image);
 						}catch (NumberFormatException e) {
