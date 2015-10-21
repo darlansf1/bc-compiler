@@ -1,0 +1,123 @@
+options{}
+PARSER_BEGIN(BCparser)
+import java.io.*;
+
+public class BCparser{
+    public static void main(String[] args) throws ParseException, TokenMgrError{
+        BCparser bcparser = new BCparser(System.in);
+        try{
+            bcparser.start();
+            System.out.println("sucesso!");
+        }catch (Exception e) {
+            System.out.println("Nao sucesso");
+        }
+    }
+}
+
+PARSER_END(BCparser)
+
+SKIP:
+{
+	" "
+|	"\t"
+| 	"\n"
+}
+
+TOKEN:
+{
+    <EOL: "\n" | "\r" | "\r\n" > |
+    <PLUS: "+"> 
+}
+
+
+/*Separadores e Agrupadores*/
+TOKEN:
+{
+  <LPAR: "(">
+ | <RPAR: ")">
+|	<LBRACK: "{">
+|	<RBRACK: "}">
+|	<SEMICOLON: ";">
+|	<COMMA: ",">
+/*|	<QUOT: \"\" "> */
+|	<LSQ_BRACK: "[">
+|	<RSQ_BRACK: "]">
+|	<DOT: ".">
+}
+
+/*Palavras reservadas e funcoes nativas*/
+TOKEN:
+{
+  <IBASE: "ibase"> |
+  <SCALE: "scale">
+/*	|	<LAST: "last" | ".">*/
+	|	<OBASE: "obase">
+	|	<SQRT: "sqrt">
+	|	<LENGTH: "length">
+	|	<FUNC_S: "s">
+	|	<FUNC_C: "c">
+	|	<FUNC_E: "e">
+	|	<FUNC_L: "l">
+	|	<FUNC_A: "a">
+	|	<FUNC_J: "j">
+|	<IF: "if">
+	|	<ELSE: "else">
+	|	<WHILE: "while">
+	|	<FOR: "for">
+	|	<PRINT: "print">
+	|	<DEFINE: "define">
+	|	<AUTO: "auto">
+	|	<BREAK: "break">
+	|	<CONTINUE: "continue">
+	|	<QUIT: "quit">
+	|	<RETURN: "return">
+}
+
+/*Numeros, palavras e identificadores*/
+TOKEN:
+{
+  <#DIGIT: ["0"-"9"] > |
+  <LETTER: "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" | "n" | "o" | "p"| "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z" | "_">
+|	<SYMBOL: " " | "!" /*| """*/  | "%" | "&" | "'" | "(" | ")" | "*" | "+" | "," | "-" | "." | "/" | ":" | ";" | "<" | "=" |">"  | "[" | "]" | "^" | "{" | "|" | "}">
+		
+	|	<INTEGER: ("-" | "+")? (<DIGIT>)+>
+	|	<REAL: ("-" | "+")? (<DIGIT>)+ "." (<DIGIT>)+>
+/*|	<NUM: <INTEGER> | <REAL> >*/
+|	<ALPHANUMERIC: <DIGIT> | <LETTER> >
+|	<ID: <LETTER> (<ALPHANUMERIC>)*>
+}
+
+
+
+void start():
+{
+  /*var locais*/
+    int value;
+}
+{
+   bc() <EOF>
+}
+
+void bc():
+{ }
+{ 
+  (comando() | def_funcao())*
+  
+}
+
+void comando():
+{ }
+{
+
+  <ID>{System.out.println("-> ID "); }
+
+ 
+}
+
+void def_funcao():
+{ }
+{
+  <DEFINE> {System.out.println("->def funcao");}
+
+}
+
