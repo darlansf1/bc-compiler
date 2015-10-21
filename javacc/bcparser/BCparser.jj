@@ -26,7 +26,11 @@ SKIP:
 TOKEN:
 {
     <EOL: "\n" | "\r" | "\r\n" > |
-    <PLUS: "+"> 
+    <PLUS: "+"> |
+    <MINUS: "-"> |
+    <DIV: "/"> |
+    <MUL: "*"> |
+    <MOD: "%">
 }
 
 
@@ -43,6 +47,11 @@ TOKEN:
 |	<LSQ_BRACK: "[">
 |	<RSQ_BRACK: "]">
 |	<DOT: ".">
+|	<BANG: "!">
+|	<GT: ">">
+|	<LT: "<">
+|	<ASSIGN_SYMBOL: "=">
+
 }
 
 /*Palavras reservadas e funcoes nativas*/
@@ -78,7 +87,7 @@ TOKEN:
 {
   <#DIGIT: ["0"-"9"] > |
   <LETTER: "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" | "n" | "o" | "p"| "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z" | "_">
-|	<SYMBOL: " " | "!" /*| """*/  | "%" | "&" | "'" | "(" | ")" | "*" | "+" | "," | "-" | "." | "/" | ":" | ";" | "<" | "=" |">"  | "[" | "]" | "^" | "{" | "|" | "}">
+|	<SYMBOL: " " | <BANG> /*| """*/  | "%" | "&" | "'" | "(" | ")" | "*" | "+" | "," | "-" | "." | "/" | ":" | ";" | <LT> | <ASSIGN_SYMBOL> | <GT>  | "[" | "]" | "^" | "{" | "|" | "}">
 		
 	|	<INTEGER: ("-" | "+")? (<DIGIT>)+>
 	|	<REAL: ("-" | "+")? (<DIGIT>)+ "." (<DIGIT>)+>
@@ -88,7 +97,11 @@ TOKEN:
 }
 
 
-
+/****TMP TOKENS**/
+TOKEN:
+{
+    <E7: "++"> 
+}
 void start():
 {
   /*var locais*/
@@ -109,9 +122,21 @@ void comando():
 { }
 {
 
-  <ID>{System.out.println("-> ID "); }
+  //<ID>{System.out.println("-> ID "); }
+  E() //<E> 
+  /*
+  | <comando_composto> 
+  | <IF> 
+  | <WHILE> 
+  | <FOR> 
+  | <NULL> 
+  | <BREAK> 
+  | <CONTNUE>
+  | <QUIT>
+  | <PRINT>
+  | <STRING>
+  */
 
- 
 }
 
 void def_funcao():
@@ -120,4 +145,68 @@ void def_funcao():
   <DEFINE> {System.out.println("->def funcao");}
 
 }
+
+
+/*<E>::= <E1> ( || <E1> )* */
+void E():
+{Token t;}
+{
+  E1() ( "||" E1())* 
+  //{ System.out.println("->||");}
+
+}
+
+/*<E1>::= <E2> ( && <E2> )* */
+void E1():
+{}
+{
+  E2() ( "&&" E2())*
+
+}
+
+/*<E2>::= [ ! ] <E3> */
+void E2():
+{}
+{
+  (<BANG>)? E3()
+
+}
+
+/*<E3>
+ ::= <E4> [ (== | <= | >= | != | < | > ) <E4> ]
+*/
+void E3():
+{}
+{
+  E4() (("==" | "<=" | ">=" | "!=" | <LT> | <GT>) E4())?
+
+}
+
+
+/*<E4>
+ ::= <E5> [ ( = | += | -= | *= | /= | %= | ^= ) <E4> ] 
+ # ou <E5> | <E5> ( = | +=|-=|*=| /= | %= | ^= ) <E4> 
+ */
+void E4():
+{}
+{
+  E5() ((<ASSIGN_SYMBOL> | "+=" | "-=" | "*=" | "/=" | "%=" | "^=") E4())?
+} 
+
+/*<E5>::= <E6> ( ( + | - ) <E6> )* */
+
+void E5():
+{}
+{
+  E6() ((<PLUS> | <MINUS>) E6() )*
+} 
+
+
+/*<E6>::= <E7> ( ( * | / | % ) <E7> )* */
+void E6():
+{}
+{
+  <E7> ( ("*" | "/"| "%") <E7>)*
+} 
+
 
