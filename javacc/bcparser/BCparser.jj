@@ -30,7 +30,10 @@ TOKEN:
     <MINUS: "-"> |
     <DIV: "/"> |
     <MUL: "*"> |
-    <MOD: "%">
+    <MOD: "%"> |
+    <POWER: "^"> |
+    <PLUSPLUS: "++"> |
+    <MINUSMINUS: "--">
 }
 
 
@@ -50,7 +53,7 @@ TOKEN:
 |	<BANG: "!">
 |	<GT: ">">
 |	<LT: "<">
-|	<ASSIGN_SYMBOL: "=">
+|	<ASSIGN_SYMBOL: "="> 
 
 }
 
@@ -97,11 +100,12 @@ TOKEN:
 }
 
 
-/****TMP TOKENS**/
+/****TMP TOKENS**
 TOKEN:
 {
-    <E7: "++"> 
+    <E10: ".-"> 
 }
+*/
 void start():
 {
   /*var locais*/
@@ -206,7 +210,41 @@ void E5():
 void E6():
 {}
 {
-  <E7> ( ("*" | "/"| "%") <E7>)*
+  E7() ( ("*" | "/"| "%") E7())*
 } 
+
+
+/*<E7>::= <E8> [ ^ <E7> ] */
+void E7():
+{}
+{
+  E8() ( "^" E7())?
+} 
+
+/*<E8> ::= [ - ] <E9> */
+void E8():
+{}
+{
+  ( <MINUS> )? E9()
+}
+
+/*<E9> ::= [ ++ | -- ] <E10> | <E10> [ ++ | -- ] */
+//TODO: nao é LL1
+void E9():
+{}
+{
+  //( <PLUSPLUS> | <MINUSMINUS>)? <E10> | <E10> ( <PLUSPLUS> | <MINUSMINUS>)?
+  ( <PLUSPLUS> | <MINUSMINUS>)? E10()
+}
+
+
+/*<E10> ::= <NUM> | ( <E> ) | sqrt ( <E> ) | length ( <E> ) | scale ( <E> ) | <chamada_função> |
+<ID> | <ID> [ <E> ] | ibase | obase | scale | last | . */
+void E10():
+{}
+{
+  <INTEGER> | "(" E() ")" 
+}
+ 
 
 
