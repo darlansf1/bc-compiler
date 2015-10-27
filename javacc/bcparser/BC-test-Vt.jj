@@ -1,0 +1,197 @@
+options{}
+/*options{DEBUG_PARSER = true;}*/
+PARSER_BEGIN(BCparser)
+import java.io.*;
+
+public class BCparser{
+    public static void main(String[] args) throws ParseException, TokenMgrError{
+        BCparser bcparser = new BCparser(System.in);
+        try{
+            bcparser.start();
+            System.out.println("sucesso!");
+        }catch (Exception e) {
+            System.out.println("Nao sucesso\n" + e.toString());
+        }
+    }
+}
+
+PARSER_END(BCparser)
+
+SKIP : {
+ " "
+|  "\t"
+|  "\n"
+|  "\r"
+|  <"//" (~["\n","\r"])* ("\n" | "\r" | "\r\n")>
+|  <"/*" (~["*"])* "*" ("*" | ~["*","/"] (~["*"])* "*")* "/">
+}
+
+TOKEN:
+{
+    <EOL: "\\n" | "\\r" | "\\r\\n" > |
+    <PLUS: "+"> |
+    <MINUS: "-"> |
+    <DIV: "/"> |
+    <MUL: "*"> |
+    <MOD: "%"> |
+    <POWER: "^"> |
+    <PLUSPLUS: "++"> |
+    <MINUSMINUS: "--"> |
+   <OR: "||"> |
+  <AND: "&&"> |
+   <NOT: "!"> |
+ <MINUS_ASSIGN: "-="> |
+<PLUS_ASSIGN: "+="> |
+<DIV_ASSIGN: "/="> |
+<MUL_ASSIGN: "*="> |
+<MOD_ASSIGN: "%="> |
+<POWER_ASSIGN: "^="> |
+<GT: ">"> |
+<LT: "<"> |
+<GTE: ">="> |
+<LTE: "<="> |
+<EQUAL: "=="> |
+<DIFF: "!="> 
+}
+
+
+/*Separadores e Agrupadores*/
+TOKEN:
+{
+  <LPAR: "(">
+ | <RPAR: ")">
+|	<LBRACK: "{">
+|	<RBRACK: "}">
+|	<SEMICOLON: ";">
+|	<COMMA: ",">
+|	<QUOT: "\""> 
+|	<LSQ_BRACK: "[">
+|	<RSQ_BRACK: "]">
+|	<DOT: ".">
+|	<ASSIGN_SYMBOL: "="> 
+| 	<SEPARADOR: <SEMICOLON>>
+}
+
+/*Palavras reservadas e funcoes nativas*/
+TOKEN:
+{
+  <IBASE: "ibase"> |
+  <SCALE: "scale">
+	|	<LAST: "last" | <DOT>>
+	|	<OBASE: "obase">
+	|	<SQRT: "sqrt">
+	|	<LENGTH: "length">
+	|	<FUNC_S: "s">
+	|	<FUNC_C: "c">
+	|	<FUNC_E: "e">
+	|	<FUNC_L: "l">
+	|	<FUNC_A: "a">
+	|	<FUNC_J: "j">
+|	<IF: "if">
+	|	<ELSE: "else">
+	|	<WHILE: "while">
+	|	<FOR: "for">
+	|	<PRINT: "print">
+	|	<DEFINE: "define">
+	|	<AUTO: "auto">
+	|	<BREAK: "break">
+	|	<CONTINUE: "continue">
+	|	<QUIT: "quit">
+	|	<RETURN: "return">
+}
+
+/*Numeros, palavras e identificadores*/
+TOKEN:
+{
+  <#DIGIT: ["0"-"9"] > |
+  <#LETTER: "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" | "n" | "o" | "p"| "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z" | "_"> |
+  <#SYMBOL: " " | <NOT> | "%" | "&" | "'" | "(" | ")" | "*" | "+" | "," | "-" | "." | "/" | ":" | ";" | <LT> | <ASSIGN_SYMBOL> | <GT>  | "[" | "]" | "^" | "{" | "|" | "}"> | 
+		
+	<#INTEGER: ("-" | "+")? (<DIGIT>)+> |
+	<#REAL: ("-" | "+")? (<DIGIT>)+ "." (<DIGIT>)+> |
+	<NUM: <INTEGER> | <REAL> > |
+	<#ALPHANUMERIC: <DIGIT> | <LETTER> > |
+	< ID: <LETTER> (<ALPHANUMERIC> )* > |
+	<STRING: <QUOT>(<ALPHANUMERIC>|<SYMBOL>|<EOL>)*<QUOT>>
+}
+
+
+/****TMP TOKENS**
+TOKEN:
+{
+    <E10: ".-"> 
+}
+*/
+
+
+void start():
+{Token t;}
+{
+    (t = <EOL> {System.out.printf("@(%d,%d)\t<EOL>\t-\t%s\n", t.beginLine, t.beginColumn, t);} |
+  t = <PLUS>   {System.out.printf("@(%d,%d)\t<PLUS>\t-\t%s\n", t.beginLine, t.beginColumn, t);}  | 
+     t = <MINUS>  {System.out.printf("@(%d,%d)\t<MINUS>\t-\t%s\n", t.beginLine, t.beginColumn, t);}  | 
+     t = <DIV>  {System.out.printf("@(%d,%d)\t<DIV>\t-\t%s\n", t.beginLine, t.beginColumn, t);}  | 
+     t = <MUL>  {System.out.printf("@(%d,%d)\t<MUL>\t-\t%s\n", t.beginLine, t.beginColumn, t);}  | 
+     t = <MOD> {System.out.printf("@(%d,%d)\t<MOD>\t-\t%s\n", t.beginLine, t.beginColumn, t);}  | 
+     t = <POWER>  {System.out.printf("@(%d,%d)\t<POWER>\t-\t%s\n", t.beginLine, t.beginColumn, t);}  | 
+     t = <PLUSPLUS>  {System.out.printf("@(%d,%d)\t<PLUSPLUS>\t-\t%s\n", t.beginLine, t.beginColumn, t);}  | 
+     t = <MINUSMINUS>  {System.out.printf("@(%d,%d)\t<MINUSMINUS>\t-\t%s\n", t.beginLine, t.beginColumn, t);}  |
+     t = <OR>  {System.out.printf("@(%d,%d)\t<OR>\t-\t%s\n", t.beginLine, t.beginColumn, t);}  |
+     t = <AND>  {System.out.printf("@(%d,%d)\t<AND>\t-\t%s\n", t.beginLine, t.beginColumn, t);}  | 
+     t = <MINUS_ASSIGN>  {System.out.printf("@(%d,%d)\t<MINUS_ASSIGN>\t-\t%s\n", t.beginLine, t.beginColumn, t);}  |
+     t = <PLUS_ASSIGN>  {System.out.printf("@(%d,%d)\t<PLUS_ASSIGN>\t-\t%s\n", t.beginLine, t.beginColumn, t);}  |  
+t = <NOT>  {System.out.printf("@(%d,%d)\t<NOT>\t-\t%s\n", t.beginLine, t.beginColumn, t);}|
+t = <DIV_ASSIGN>  {System.out.printf("@(%d,%d)\t<DIV_ASSIGN>\t-\t%s\n", t.beginLine, t.beginColumn, t);}|
+t = <MUL_ASSIGN>  {System.out.printf("@(%d,%d)\t<MUL_ASSIGN>\t-\t%s\n", t.beginLine, t.beginColumn, t);}|
+t = <MOD_ASSIGN>  {System.out.printf("@(%d,%d)\t<MOD_ASSIGN>\t-\t%s\n", t.beginLine, t.beginColumn, t);}|
+t = <POWER_ASSIGN>  {System.out.printf("@(%d,%d)\t<POWER_ASSIGN>\t-\t%s\n", t.beginLine, t.beginColumn, t);} |
+t = <IBASE> {System.out.printf("@(%d,%d)\t<IBASE>\t-\t%s\n", t.beginLine, t.beginColumn, t);} |
+t = <SCALE> {System.out.printf("@(%d,%d)\t<SCALE>\t-\t%s\n", t.beginLine, t.beginColumn, t);} |
+t = <LAST> {System.out.printf("@(%d,%d)\t<LAST>\t-\t%s\n", t.beginLine, t.beginColumn, t);} |
+t = <OBASE> {System.out.printf("@(%d,%d)\t<OBASE>\t-\t%s\n", t.beginLine, t.beginColumn, t);} |
+t = <SQRT> {System.out.printf("@(%d,%d)\t<SQRT>\t-\t%s\n", t.beginLine, t.beginColumn, t);} |
+t = <LENGTH> {System.out.printf("@(%d,%d)\t<LENGTH>\t-\t%s\n", t.beginLine, t.beginColumn, t);} |
+t = <FUNC_S> {System.out.printf("@(%d,%d)\t<FUNC_S>\t-\t%s\n", t.beginLine, t.beginColumn, t);} |
+t = <FUNC_C> {System.out.printf("@(%d,%d)\t<FUNC_C>\t-\t%s\n", t.beginLine, t.beginColumn, t);} |
+t = <FUNC_E> {System.out.printf("@(%d,%d)\t<FUNC_E>\t-\t%s\n", t.beginLine, t.beginColumn, t);} |
+t = <FUNC_L> {System.out.printf("@(%d,%d)\t<FUNC_L>\t-\t%s\n", t.beginLine, t.beginColumn, t);} |
+t = <FUNC_A> {System.out.printf("@(%d,%d)\t<FUNC_A>\t-\t%s\n", t.beginLine, t.beginColumn, t);} |
+t = <FUNC_J> {System.out.printf("@(%d,%d)\t<FUNC_J>\t-\t%s\n", t.beginLine, t.beginColumn, t);} |
+t = <IF> {System.out.printf("@(%d,%d)\t<IF>\t-\t%s\n", t.beginLine, t.beginColumn, t);} |
+t = <ELSE> {System.out.printf("@(%d,%d)\t<ELSE>\t-\t%s\n", t.beginLine, t.beginColumn, t);} |
+t = <WHILE> {System.out.printf("@(%d,%d)\t<WHILE>\t-\t%s\n", t.beginLine, t.beginColumn, t);} |
+t = <FOR> {System.out.printf("@(%d,%d)\t<FOR>\t-\t%s\n", t.beginLine, t.beginColumn, t);} |
+t = <PRINT> {System.out.printf("@(%d,%d)\t<PRINT>\t-\t%s\n", t.beginLine, t.beginColumn, t);} |
+t = <DEFINE> {System.out.printf("@(%d,%d)\t<DEFINE>\t-\t%s\n", t.beginLine, t.beginColumn, t);} |
+t = <AUTO> {System.out.printf("@(%d,%d)\t<AUTO>\t-\t%s\n", t.beginLine, t.beginColumn, t);} |
+t = <BREAK> {System.out.printf("@(%d,%d)\t<BREAK>\t-\t%s\n", t.beginLine, t.beginColumn, t);} |
+t = <CONTINUE> {System.out.printf("@(%d,%d)\t<CONTINUE>\t-\t%s\n", t.beginLine, t.beginColumn, t);} |
+t = <QUIT> {System.out.printf("@(%d,%d)\t<QUIT>\t-\t%s\n", t.beginLine, t.beginColumn, t);} |
+t = <RETURN> {System.out.printf("@(%d,%d)\t<RETURN>\t-\t%s\n", t.beginLine, t.beginColumn, t);} |
+t = <LPAR> {System.out.printf("@(%d,%d)\t<LPAR>\t-\t%s\n", t.beginLine, t.beginColumn, t);} |
+t =  <RPAR> {System.out.printf("@(%d,%d)\t<RPAR>\t-\t%s\n", t.beginLine, t.beginColumn, t);} |
+t = <LBRACK> {System.out.printf("@(%d,%d)\t<LBRACK>\t-\t%s\n", t.beginLine, t.beginColumn, t);} |
+t = <RBRACK> {System.out.printf("@(%d,%d)\t<RBRACK>\t-\t%s\n", t.beginLine, t.beginColumn, t);} |
+t = <SEMICOLON> {System.out.printf("@(%d,%d)\t<SEMICOLON>\t-\t%s\n", t.beginLine, t.beginColumn, t);} |
+t = <COMMA> {System.out.printf("@(%d,%d)\t<COMMA>\t-\t%s\n", t.beginLine, t.beginColumn, t);} |
+t = <QUOT> {System.out.printf("@(%d,%d)\t<QUOT>\t-\t%s\n", t.beginLine, t.beginColumn, t);} | 
+t = <LSQ_BRACK> {System.out.printf("@(%d,%d)\t<LSQ_BRACK>\t-\t%s\n", t.beginLine, t.beginColumn, t);} |
+t = <RSQ_BRACK> {System.out.printf("@(%d,%d)\t<RSQ_BRACK>\t-\t%s\n", t.beginLine, t.beginColumn, t);} |
+t = <DOT> {System.out.printf("@(%d,%d)\t<DOT>\t-\t%s\n", t.beginLine, t.beginColumn, t);} |
+t = <GT> {System.out.printf("@(%d,%d)\t<GT>\t-\t%s\n", t.beginLine, t.beginColumn, t);} |
+t = <LT> {System.out.printf("@(%d,%d)\t<LT>\t-\t%s\n", t.beginLine, t.beginColumn, t);} |
+t = <GTE> {System.out.printf("@(%d,%d)\t<GTE>\t-\t%s\n", t.beginLine, t.beginColumn, t);} |
+t = <LTE> {System.out.printf("@(%d,%d)\t<LTE>\t-\t%s\n", t.beginLine, t.beginColumn, t);} |
+t = <EQUAL> {System.out.printf("@(%d,%d)\t<EQUAL>\t-\t%s\n", t.beginLine, t.beginColumn, t);} |
+t = <DIFF> {System.out.printf("@(%d,%d)\t<DIFF>\t-\t%s\n", t.beginLine, t.beginColumn, t);} |
+t = <ASSIGN_SYMBOL> {System.out.printf("@(%d,%d)\t<ASSIGN_SYMBOL>\t-\t%s\n", t.beginLine, t.beginColumn, t);} | 
+t = <ID> {System.out.printf("@(%d,%d)\t<ID>\t-\t%s\n", t.beginLine, t.beginColumn, t);} |
+t = <NUM> {System.out.printf("@(%d,%d)\t<NUM>\t-\t%s\n", t.beginLine, t.beginColumn, t);} |
+t = <STRING> {System.out.printf("@(%d,%d)\t<STRING>\t-\t%s\n", t.beginLine, t.beginColumn, t);}
+
+)* 
+t = <EOF>
+   {System.out.printf("@(%d,%d)\t<EOF>\t-\t%s\n", t.beginLine, t.beginColumn, t);}
+}
+
+
