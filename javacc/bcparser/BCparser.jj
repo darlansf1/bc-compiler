@@ -1,4 +1,4 @@
-options{}
+options{DEBUG_PARSER = true;}
 PARSER_BEGIN(BCparser)
 import java.io.*;
 
@@ -7,9 +7,10 @@ public class BCparser{
         BCparser bcparser = new BCparser(System.in);
         try{
             bcparser.start();
-            System.out.println("sucesso!");
+            System.out.println("Sucesso!");
         }catch (Exception e) {
-            System.out.println("Nao sucesso" + e.toString());
+            //System.out.println("Nao sucesso\n" + e.toString());
+            System.out.println("Erro!\n");
         }
     }
 }
@@ -27,7 +28,7 @@ SKIP : {
 
 TOKEN:
 {
-    <EOL: "\n" | "\r" | "\r\n" > |
+    <EOL: "\\n" | "\\r" | "\\r\\n" > |
     <PLUS: "+"> |
     <MINUS: "-"> |
     <DIV: "/"> |
@@ -35,7 +36,22 @@ TOKEN:
     <MOD: "%"> |
     <POWER: "^"> |
     <PLUSPLUS: "++"> |
-    <MINUSMINUS: "--">
+    <MINUSMINUS: "--"> |
+    <OR: "||"> |
+    <AND: "&&"> |
+    <NOT: "!"> |
+    <MINUS_ASSIGN: "-="> |
+    <PLUS_ASSIGN: "+="> |
+    <DIV_ASSIGN: "/="> |
+    <MUL_ASSIGN: "*="> |
+    <MOD_ASSIGN: "%="> |
+    <POWER_ASSIGN: "^="> |
+    <GT: ">"> |
+    <LT: "<"> |
+    <GTE: ">="> |
+    <LTE: "<="> |
+    <EQUAL: "=="> |
+    <DIFF: "!="> 
 }
 
 
@@ -48,24 +64,21 @@ TOKEN:
 |	<RBRACK: "}">
 |	<SEMICOLON: ";">
 |	<COMMA: ",">
-/*|	<QUOT: \"\" "> */
+|	<QUOT: "\""> 
 |	<LSQ_BRACK: "[">
 |	<RSQ_BRACK: "]">
 |	<DOT: ".">
-|	<BANG: "!">
-|	<GT: ">">
-|	<LT: "<">
 |	<ASSIGN_SYMBOL: "="> 
 | 	<SEPARADOR: <SEMICOLON>>
 }
+
 
 /*Palavras reservadas e funcoes nativas*/
 TOKEN:
 {
   <IBASE: "ibase"> |
-  <SCALE: "scale"> |
-  <LAST: "last">
-/*	|	<LAST: "last" | ".">*/
+  <SCALE: "scale">
+	|	<LAST: "last" | <DOT>>
 	|	<OBASE: "obase">
 	|	<SQRT: "sqrt">
 	|	<LENGTH: "length">
@@ -75,7 +88,7 @@ TOKEN:
 	|	<FUNC_L: "l">
 	|	<FUNC_A: "a">
 	|	<FUNC_J: "j">
-|	<IF: "if">
+	|	<IF: "if">
 	|	<ELSE: "else">
 	|	<WHILE: "while">
 	|	<FOR: "for">
@@ -92,23 +105,18 @@ TOKEN:
 TOKEN:
 {
   <#DIGIT: ["0"-"9"] > |
-  /*<LETTER: "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" | "n" | "o" | "p"| "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z" | "_">*/
-  <SYMBOL: " " | <BANG> /*| """*/  | "%" | "&" | "'" | "(" | ")" | "*" | "+" | "," | "-" | "." | "/" | ":" | ";" | <LT> | <ASSIGN_SYMBOL> | <GT>  | "[" | "]" | "^" | "{" | "|" | "}">
+  <#LETTER: "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" | "n" | "o" | "p"| "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z" | "_"> |
+  <#SYMBOL: " " | <NOT> | "%" | "&" | "'" | "(" | ")" | "*" | "+" | "," | "-" | "." | "/" | ":" | ";" | <LT> | <ASSIGN_SYMBOL> | <GT>  | "[" | "]" | "^" | "{" | "|" | "}"> | 
 		
-	|	<INTEGER: ("-" | "+")? (<DIGIT>)+>
-	|	<REAL: ("-" | "+")? (<DIGIT>)+ "." (<DIGIT>)+>
-/*|	<NUM: <INTEGER> | <REAL> >*/
-	/*<ALPHANUMERIC: <DIGIT> | <LETTER> >*/
-|	< ID: ["a"-"z","A"-"Z"] ( (" ")* ["a"-"z","A"-"Z","0"-"9"] )* >
+	<#INTEGER: ("-" | "+")? (<DIGIT>)+> |
+	<#REAL: ("-" | "+")? (<DIGIT>)+ "." (<DIGIT>)+> |
+	<NUM: <INTEGER> | <REAL> > |
+	<#ALPHANUMERIC: <DIGIT> | <LETTER> > |
+	< ID: <LETTER> (<ALPHANUMERIC> )* > |
+	<STRING: <QUOT>(<ALPHANUMERIC>|<SYMBOL>|<EOL>)*<QUOT>>
 }
 
 
-/****TMP TOKENS**
-TOKEN:
-{
-    <E10: ".-"> 
-}
-*/
 void start():
 {
   /*var locais*/
@@ -121,7 +129,7 @@ void start():
 void bc():
 { }
 { 
-  (comando() | def_funcao())*
+  ( comando() | def_funcao())*
   
 }
 
@@ -132,7 +140,7 @@ void comando():
   //<ID>{System.out.println("-> ID "); }
   E() | 
   //TODO comando_composto gera recursao a esquerda
-  /*comando_composto() |*/  
+  /*comando_composto() |*/ 
   IF_COMMAND() | 
   WHILE_COMMAND() |
   FOR_COMMAND() |
@@ -169,6 +177,7 @@ void IF_COMMAND():
 {}
 {
   <IF> <LPAR> E() <RPAR> comando() (<ELSE> comando())?
+
 }
 
 
@@ -224,17 +233,17 @@ void QUIT_COMMAND():
 void PRINT_COMMAND():
 {}
 {
-  <PRINT> ListaExpressões()
+  <PRINT> ListaExpressoes()
 }
 
 
 
 
 /*<ListaExpressões> ::= <E> ( , <E>)* */
-void ListaExpressões():
+void ListaExpressoes():
 {}
 {
-  E() (<COMMA> E())*
+  (E() (<COMMA> E())*)?
 
 }
 
@@ -244,16 +253,15 @@ void ListaExpressões():
 void E():
 {Token t;}
 {
-  E1() ( "||" E1())* 
+  E1() ( <OR> E1())* 
   //{ System.out.println("->||");}
-
 }
 
 /*<E1>::= <E2> ( && <E2> )* */
 void E1():
 {}
 {
-  E2() ( "&&" E2())*
+  E2() ( <AND> E2())*
 
 }
 
@@ -261,7 +269,7 @@ void E1():
 void E2():
 {}
 {
-  (<BANG>)? E3()
+  (<NOT>)? E3()
 
 }
 
@@ -271,8 +279,7 @@ void E2():
 void E3():
 {}
 {
-  E4() (("==" | "<=" | ">=" | "!=" | <LT> | <GT>) E4())?
-
+  E4() ((<EQUAL> | <LTE> | <GTE> | <DIFF> | <LT> | <GT>) E4())?
 }
 
 
@@ -283,15 +290,16 @@ void E3():
 void E4():
 {}
 {
-  E5() ((<ASSIGN_SYMBOL> | "+=" | "-=" | "*=" | "/=" | "%=" | "^=") E4())?
+  E5() ((<ASSIGN_SYMBOL> | <PLUS_ASSIGN> | <MINUS_ASSIGN> | <MUL_ASSIGN> | <DIV_ASSIGN> | <MOD_ASSIGN> | <POWER_ASSIGN>) E4())?
 } 
 
 /*<E5>::= <E6> ( ( + | - ) <E6> )* */
 
 void E5():
 {}
-{
-  E6() ((<PLUS> | <MINUS>) E6() )*
+{ 
+  E6() ((<PLUS> | <MINUS>) E6() )* 
+      
 } 
 
 
@@ -299,7 +307,7 @@ void E5():
 void E6():
 {}
 {
-  E7() ( ("*" | "/"| "%") E7())*
+  E7() ( (<MUL> | <DIV>| <MOD>) E7())*
 } 
 
 
@@ -307,7 +315,7 @@ void E6():
 void E7():
 {}
 {
-  E8() ( "^" E7())?
+  E8() ( <POWER> E7())?
 } 
 
 /*<E8> ::= [ - ] <E9> */
@@ -333,10 +341,8 @@ void E9():
 void E10():
 {}
 {
-  <INTEGER> | <LPAR> E() <RPAR> | <SQRT> E() | <LENGTH> <LPAR> E() <RPAR> | <SCALE> (<LPAR> E() <RPAR>)? |
-     <ID> | /*chamada_funcao() |*/ /*<ID> (E())? | */<IBASE> | <OBASE>  | <LAST> | "."
-    
-    
+  <NUM> | <LPAR> E() <RPAR> | <SQRT> <LPAR> E() <RPAR> | <LENGTH> <LPAR> E() <RPAR> | <SCALE> (<LPAR> E() <RPAR>)? |
+      /*LOOKAHEAD(2) chamada_funcao() |*/ <ID>| /*<ID> (E())? | */<IBASE> | <OBASE>  | <LAST> | "."   
 }
  
  
@@ -344,17 +350,19 @@ void E10():
 void chamada_funcao():
 {}
 {
-  <ID> <LPAR> ListaExpressões() <RPAR>
-
+  <ID> <LPAR> ListaExpressoes() <RPAR>
+ 
 }
 
 
 /*<definição de função> ::= define <ID> ( [ <ListaVar> ] ) { auto <ListaVar> <ListaComandos>
 [ <RETORNO> ] } */
 void def_funcao():
-{ }
+{}
 {
-  <DEFINE> <ID> <LPAR> (ListaVar())? <LBRACK> <AUTO> ListaVar() ListaComandos() (RETORNO())? <RBRACK>
+  <DEFINE> <ID> <LPAR> (ListaVar())? <RPAR> <LBRACK> <AUTO> ListaVar() comando() (RETORNO())? <RBRACK>
+  //<DEFINE> <ID> <LPAR> <RPAR> <LBRACK> <RBRACK>
+  
 }
  
  
