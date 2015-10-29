@@ -1,3 +1,4 @@
+ 
 options{DEBUG_PARSER = true;}
 PARSER_BEGIN(BCparser)
 import java.io.*;
@@ -69,7 +70,7 @@ TOKEN:
 |	<RSQ_BRACK: "]">
 |	<DOT: ".">
 |	<ASSIGN_SYMBOL: "="> 
-| 	<SEPARADOR: <SEMICOLON>>
+| 	<SEPARADOR: <SEMICOLON>|"\\n">
 }
 
 
@@ -129,7 +130,7 @@ void start():
 void bc():
 { }
 { 
-  ( comando() | def_funcao())*
+  ( comando() | def_funcao())+
   
 }
 
@@ -140,7 +141,7 @@ void comando():
   //<ID>{System.out.println("-> ID "); }
   E() | 
   //TODO comando_composto gera recursao a esquerda
-  /*comando_composto() |*/ 
+  /*comando_composto()*/ 
   IF_COMMAND() | 
   WHILE_COMMAND() |
   FOR_COMMAND() |
@@ -148,9 +149,8 @@ void comando():
   BREAK_COMMAND() |
   CONTINUE_COMMAND() |
   QUIT_COMMAND() |
-  PRINT_COMMAND() /*
-  | <STRING>
-  */
+  PRINT_COMMAND() |
+  STRING_COMMAND()
 
 }
 
@@ -170,7 +170,6 @@ void ListaComandos():
 {
   comando() (<SEPARADOR> comando())*
 }
-
 
 /*<IF> ::= if ( <E> ) <comando> [ else <comando> ] */
 void IF_COMMAND():
@@ -193,7 +192,7 @@ void WHILE_COMMAND():
 void FOR_COMMAND():
 {}
 {
-  <FOR> <LPAR> (E())? <SEMICOLON> (E())? <SEMICOLON> (E())? <RPAR>
+  <FOR> <LPAR> (E())? <SEMICOLON> (E())? <SEMICOLON> (E())? <RPAR> comando()
 }
 
 
@@ -236,6 +235,12 @@ void PRINT_COMMAND():
   <PRINT> ListaExpressoes()
 }
 
+/*<STRING_COMMAND> ::= <STRING>*/
+void STRING_COMMAND():
+{}
+{
+  <STRING>
+}
 
 
 
@@ -243,8 +248,7 @@ void PRINT_COMMAND():
 void ListaExpressoes():
 {}
 {
-  (E() (<COMMA> E())*)?
-
+  E() (<COMMA> E())*
 }
 
 
@@ -330,8 +334,8 @@ void E8():
 void E9():
 {}
 {
-  //( <PLUSPLUS> | <MINUSMINUS>)? <E10> | <E10> ( <PLUSPLUS> | <MINUSMINUS>)?
-  ( <PLUSPLUS> | <MINUSMINUS>)? E10()
+  LOOKAHEAD(2)( <PLUSPLUS> | <MINUSMINUS>)? E10() | E10() ( <PLUSPLUS> | <MINUSMINUS>)?
+  //( <PLUSPLUS> | <MINUSMINUS>)? E10()
 }
 
 
@@ -341,8 +345,8 @@ void E9():
 void E10():
 {}
 {
-  <NUM> | <LPAR> E() <RPAR> | <SQRT> <LPAR> E() <RPAR> | <LENGTH> <LPAR> E() <RPAR> | <SCALE> (<LPAR> E() <RPAR>)? |
-      /*LOOKAHEAD(2) chamada_funcao() |*/ <ID>| /*<ID> (E())? | */<IBASE> | <OBASE>  | <LAST> | "."   
+  <NUM> | <LPAR> E() <RPAR> | <SQRT> <LPAR> E() <RPAR> | <LENGTH> <LPAR> E() <RPAR> | <SCALE> <LPAR> E() <RPAR> |
+      LOOKAHEAD(2) chamada_funcao() | <ID>| /*<ID> (E())? | */<IBASE> | <OBASE>  | <LAST>
 }
  
  
@@ -350,7 +354,7 @@ void E10():
 void chamada_funcao():
 {}
 {
-  <ID> <LPAR> ListaExpressoes() <RPAR>
+  <ID> <LPAR> (ListaExpressoes())? <RPAR>
  
 }
 
@@ -360,17 +364,17 @@ void chamada_funcao():
 void def_funcao():
 {}
 {
-  <DEFINE> <ID> <LPAR> (ListaVar())? <RPAR> <LBRACK> <AUTO> ListaVar() comando() (RETORNO())? <RBRACK>
+  <DEFINE> <ID> <LPAR> (ListaVar())? <RPAR> <LBRACK> <AUTO> ListaVar() ListaComandos() (RETORNO())? <RBRACK>
   //<DEFINE> <ID> <LPAR> <RPAR> <LBRACK> <RBRACK>
   
 }
  
  
-/*<RETORNO> ::= return ( [<E>] ) | return [<E>]*/
+/*<RETORNO> ::= return ( [<E>] ) | return [<E>] */
 void RETORNO():
 { }
 {
-  <RETURN> (<LPAR> (E())? <RPAR> | (E())*)
+  <RETURN> (<LPAR> (E())? <RPAR> | (E())?)	
 }
 
  
@@ -378,8 +382,9 @@ void RETORNO():
 void ListaVar():
 { }
 {
-  <ID> (<LBRACK> <RBRACK>)? ( "," <ID> (<LBRACK> <RBRACK>)? )*
+  <ID> (<LBRACK> <RBRACK>)? ( <COMMA> <ID> (<LBRACK> <RBRACK>)? )*
 }
 
  
+
 
